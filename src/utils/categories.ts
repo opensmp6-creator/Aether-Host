@@ -275,3 +275,17 @@ services:
           memory: ${config.ramGb}G
 `;
 }
+
+/**
+ * Calculates the next free unique port for a given category
+ */
+export function getNextAvailablePort(
+  category: ServerCategory,
+  usedPorts: number[]
+): number {
+  let port = CATEGORIES[category]?.defaultPort || 25565;
+  while (usedPorts.includes(port)) {
+    port += 1;
+  }
+  return port;
+}

@@ -8,6 +8,7 @@ import {
   calculateMonthlyPrice,
   formatCurrency,
   generateDockerCompose,
+  getNextAvailablePort,
 } from '../utils/categories';
 import {
   Server,
@@ -41,12 +42,15 @@ export const OrderConfiguratorView: React.FC = () => {
     teamCanManageTestServers,
     setCurrentTab,
     addToast,
+    servers,
   } = useApp();
 
   // Configurator state
   const [selectedCategory, setSelectedCategory] = useState<ServerCategory>('linux_vps');
   const [serverName, setServerName] = useState<string>('');
   const [selectedOs, setSelectedOs] = useState<string>(CATEGORIES.linux_vps.recommendedOs);
+  const [customPort, setCustomPort] = useState<number>(22);
+  const [customIp, setCustomIp] = useState<string>('192.168.2.76');
   const [ramGb, setRamGb] = useState<number>(CATEGORIES.linux_vps.defaultRam);
   const [cpuCores, setCpuCores] = useState<number>(CATEGORIES.linux_vps.defaultCpu);
   const [nvmeGb, setNvmeGb] = useState<number>(CATEGORIES.linux_vps.defaultNvme);
@@ -75,6 +79,8 @@ export const OrderConfiguratorView: React.FC = () => {
     setRamGb(catConfig.defaultRam);
     setCpuCores(catConfig.defaultCpu);
     setNvmeGb(catConfig.defaultNvme);
+    const nextPort = getNextAvailablePort(cat, servers.map((s) => s.port));
+    setCustomPort(nextPort);
   };
 
   const monthlyPrice = calculateMonthlyPrice(ramGb, cpuCores, nvmeGb);

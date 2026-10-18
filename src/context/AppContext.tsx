@@ -13,6 +13,7 @@ import {
   generateIpAddress,
   generateRandomPassword,
   CATEGORIES,
+  getNextAvailablePort,
 } from '../utils/categories';
 
 interface AppContextType {
@@ -44,6 +45,8 @@ interface AppContextType {
     nvmeGb: number;
     location: string;
     paymentMethod: PaymentMethod;
+    port?: number;
+    ipAddress?: string;
   }) => Promise<{ success: boolean; serverId?: string; message?: string }>;
 
   importExistingServer: (data: {
@@ -185,6 +188,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     nvmeGb: number;
     location: string;
     paymentMethod: PaymentMethod;
+    port?: number;
+    ipAddress?: string;
   }) => {
     const cost = calculateMonthlyPrice(config.ramGb, config.cpuCores, config.nvmeGb);
 
@@ -200,6 +205,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const newServerId = 'srv-' + Math.random().toString(36).substring(2, 9);
     const categoryDefaults = CATEGORIES[config.category];
 
+    // Calculate unique port for this server (e.g., 25565, 25566, 25567)
+    const usedPorts = servers.map((s) => s.port);
+    const assignedPort = config.port && config.port > 0
+      ? config.port
+      : getNextAvailablePort(config.category, usedPorts);
+
     const newServer: ServerInstance = {
       id: newServerId,
       name: config.name.trim() || `${categoryDefaults.name} #${Math.floor(Math.random() * 900 + 100)}`,
@@ -209,8 +220,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       cpuCores: config.cpuCores,
       nvmeGb: config.nvmeGb,
       monthlyCost: cost,
-      ipAddress: generateIpAddress(),
-      port: categoryDefaults.defaultPort,
+      ipAddress: config.ipAddress || generateIpAddress(),
+      port: assignedPort,
       status: 'active',
       createdAt: new Date().toLocaleDateString('de-DE'),
       isTestServer: false,
