@@ -1,0 +1,6 @@
+{
+  "name": "AetherHost - Cloud & VPS Server Portal",
+  "description": "Modernes Cloud- & Game-Server Hosting Dashboard mit VPS-Konfigurator, 24h-Testservern und Admin-Verwaltung.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

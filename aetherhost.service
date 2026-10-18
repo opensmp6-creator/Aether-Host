@@ -1,0 +1,16 @@
+[Unit]
+Description=AetherHost Cloud Dashboard Daemon
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/var/www/aetherhost
+ExecStart=/usr/bin/npx tsx server.ts
+Restart=always
+RestartSec=5
+Environment=NODE_ENV=production
+Environment=PORT=3000
+
+[Install]
+WantedBy=multi-user.target
