@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency, generateDockerCompose } from '../utils/categories';
 import { ServerInstance } from '../types';
+import { ImportServerModal } from '../components/ImportServerModal';
 
 export const DashboardView: React.FC = () => {
   const {
@@ -38,6 +39,7 @@ export const DashboardView: React.FC = () => {
     loadSampleData,
   } = useApp();
 
+  const [showImportModal, setShowImportModal] = useState<boolean>(false);
   const [selectedServer, setSelectedServer] = useState<ServerInstance | null>(null);
   const [copiedIp, setCopiedIp] = useState<string | null>(null);
   const [consoleLogs, setConsoleLogs] = useState<string[]>([
@@ -267,15 +269,25 @@ export const DashboardView: React.FC = () => {
             </p>
           </div>
 
-          {servers.length === 0 && (
+          <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
             <button
-              onClick={loadSampleData}
-              className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors self-start sm:self-auto"
+              onClick={() => setShowImportModal(true)}
+              className="inline-flex items-center gap-1.5 text-xs text-emerald-300 hover:text-white px-3 py-1.5 rounded-lg bg-emerald-950/40 border border-emerald-500/40 hover:bg-emerald-900/50 transition-colors shadow-sm"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>Beispieldaten für Test laden</span>
+              <PlusCircle className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Laufenden Server hinzufügen</span>
             </button>
-          )}
+
+            {servers.length === 0 && (
+              <button
+                onClick={loadSampleData}
+                className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span>Beispieldaten für Test laden</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Leerer Startzustand Hinweis zur Bestellung */}
@@ -287,16 +299,23 @@ export const DashboardView: React.FC = () => {
             <div className="max-w-md mx-auto space-y-1.5">
               <h4 className="text-base font-bold text-white">Keine aktiven Server vorhanden</h4>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Du hast aktuell noch keinen Server gemietet. Konfiguriere jetzt deine gewünschte Instanz mit individueller CPU-, RAM- und SSD-Zuteilung oder fordere einen kostenlosen 24h-Testserver an.
+                Du hast aktuell noch keinen Server gemietet. Konfiguriere jetzt deine gewünschte Instanz oder binde deinen bereits laufenden Heimserver (z. B. 192.168.2.76) direkt ein.
               </p>
             </div>
             <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
               <button
+                onClick={() => setShowImportModal(true)}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/30 transition-all"
+              >
+                <PlusCircle className="w-4 h-4" />
+                <span>Laufenden Server einbinden</span>
+              </button>
+              <button
                 onClick={() => setCurrentTab('order_server')}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-600/30 transition-all"
               >
-                <PlusCircle className="w-4 h-4" />
-                <span>Jetzt Server bestellen</span>
+                <Server className="w-4 h-4" />
+                <span>Neuen Server bestellen</span>
               </button>
               <button
                 onClick={() => setCurrentTab('order_server')}
@@ -603,6 +622,12 @@ export const DashboardView: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Import Existing Server Modal */}
+      <ImportServerModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+      />
     </div>
   );
 };

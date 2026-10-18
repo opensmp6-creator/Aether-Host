@@ -238,7 +238,7 @@ fi
 
 echo "[2/4] Installiere NPM Abhängigkeiten und baue Dashboard..."
 cd "$(dirname "$0")"
-npm install
+npm install --legacy-peer-deps
 npm run build
 
 echo "[3/4] Richte Systemd Dienst 'aetherhost.service' ein..."

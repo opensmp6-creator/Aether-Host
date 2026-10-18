@@ -46,6 +46,20 @@ interface AppContextType {
     paymentMethod: PaymentMethod;
   }) => Promise<{ success: boolean; serverId?: string; message?: string }>;
 
+  importExistingServer: (data: {
+    name: string;
+    category: ServerCategory;
+    os: string;
+    ipAddress: string;
+    port: number;
+    ramGb: number;
+    cpuCores: number;
+    nvmeGb: number;
+    monthlyCost?: number;
+    rootPassword?: string;
+    location?: string;
+  }) => void;
+
   requestTestServer: (data: {
     userName: string;
     userEmail: string;
@@ -222,6 +236,49 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     addToast(`Server "${newServer.name}" erfolgreich bereitgestellt! IP: ${newServer.ipAddress}`, 'success');
     return { success: true, serverId: newServerId };
+  };
+
+  // Import existing running server
+  const importExistingServer = (data: {
+    name: string;
+    category: ServerCategory;
+    os: string;
+    ipAddress: string;
+    port: number;
+    ramGb: number;
+    cpuCores: number;
+    nvmeGb: number;
+    monthlyCost?: number;
+    rootPassword?: string;
+    location?: string;
+  }) => {
+    const newServerId = 'srv-imp-' + Math.random().toString(36).substring(2, 9);
+    const cost = data.monthlyCost !== undefined
+      ? data.monthlyCost
+      : calculateMonthlyPrice(data.ramGb, data.cpuCores, data.nvmeGb);
+
+    const importedServer: ServerInstance = {
+      id: newServerId,
+      name: data.name.trim() || `${CATEGORIES[data.category].name} (Bestehend)`,
+      category: data.category,
+      os: data.os || CATEGORIES[data.category].recommendedOs,
+      ramGb: data.ramGb || 4,
+      cpuCores: data.cpuCores || 2,
+      nvmeGb: data.nvmeGb || 50,
+      monthlyCost: cost,
+      ipAddress: data.ipAddress.trim() || '127.0.0.1',
+      port: data.port || CATEGORIES[data.category].defaultPort,
+      status: 'active',
+      createdAt: new Date().toLocaleDateString('de-DE'),
+      isTestServer: false,
+      location: data.location || 'Lokaler Server / Eigenes Rechenzentrum',
+      hostname: `${data.category.replace('_', '-')}-${newServerId.slice(8)}.local`,
+      rootPassword: data.rootPassword || 'Vorhanden',
+      uptimeHours: 24,
+    };
+
+    setServers((prev) => [importedServer, ...prev]);
+    addToast(`Laufender Server "${importedServer.name}" (${importedServer.ipAddress}:${importedServer.port}) erfolgreich ins Dashboard aufgenommen!`, 'success');
   };
 
   // 24h Test Server Request
@@ -690,6 +747,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         teamCanManageTestServers,
         notifications,
         orderServer,
+        importExistingServer,
         requestTestServer,
         approveTestServer,
         rejectTestServer,

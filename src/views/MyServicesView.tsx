@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { formatCurrency, generateDockerCompose, CATEGORIES } from '../utils/categories';
 import { ServerInstance, ServerCategory } from '../types';
+import { ImportServerModal } from '../components/ImportServerModal';
 
 export const MyServicesView: React.FC = () => {
   const {
@@ -29,6 +30,7 @@ export const MyServicesView: React.FC = () => {
     loadSampleData,
   } = useApp();
 
+  const [showImportModal, setShowImportModal] = useState<boolean>(false);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -82,13 +84,22 @@ export const MyServicesView: React.FC = () => {
           </p>
         </div>
 
-        <button
-          onClick={() => setCurrentTab('order_server')}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-500/20 transition-all self-start sm:self-auto"
-        >
-          <PlusCircle className="w-4 h-4" />
-          <span>Neuen Server buchen</span>
-        </button>
+        <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+          <button
+            onClick={() => setShowImportModal(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-bold border border-emerald-500/40 transition-all shadow-sm"
+          >
+            <PlusCircle className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Laufenden Server hinzufügen</span>
+          </button>
+          <button
+            onClick={() => setCurrentTab('order_server')}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-500/20 transition-all"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>Neuen Server buchen</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter and Search Bar */}
@@ -351,6 +362,12 @@ export const MyServicesView: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Import Server Modal */}
+      <ImportServerModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+      />
     </div>
   );
 };

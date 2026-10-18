@@ -32,7 +32,7 @@ fi
 
 echo "[3/5] Installiere Abhängigkeiten und baue Production Assets..."
 cd "$(dirname "$0")"
-npm install
+npm install --legacy-peer-deps
 npm run build
 
 echo "[4/5] Richte Systemd Dienst 'aetherhost.service' ein..."
